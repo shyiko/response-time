@@ -47,6 +47,8 @@ module.exports = function responseTime(options) {
     ? Boolean(options.suffix)
     : true
 
+  var unit = options.unit || 'ms'
+
   return function responseTime(req, res, next) {
     var startAt = process.hrtime()
 
@@ -56,11 +58,14 @@ module.exports = function responseTime(options) {
       }
 
       var diff = process.hrtime(startAt)
-      var ms = diff[0] * 1e3 + diff[1] * 1e-6
-      var val = ms.toFixed(digits)
+      var val = diff[0] * 1e3 + diff[1] * 1e-6
+      if (unit === 's') {
+        val /= 1e3
+      }
+      val = val.toFixed(digits)
 
       if (suffix) {
-        val += 'ms'
+        val += unit
       }
 
       this.setHeader(header, val)
